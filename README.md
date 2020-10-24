@@ -23,8 +23,7 @@ npm install @react-navigation/stack
 npm install @react-navigation/bottom-tabs
 ```
 
-
-##　タブのある画面を作る
+## タブのある画面を作る
 
 試しに、２つのタブと画面を作成
 
@@ -130,3 +129,91 @@ function SettingsScreen() {
 
 ```
 
+## Step2 それぞれのファイルに分割
+
+### ホーム画面を作る
+
+```sh
+touch src/screens/HomeScreen.js
+```
+
+src/screens/HomeScreen.js 
+```javascript
+import React from 'react';
+import { View, Button, Text } from 'react-native';
+
+export default function HomeScreen({ navigation }) {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Home!</Text>
+      <Button title="open Modal" onPress={() => navigation.navigate('MyModal')} />
+    </View>
+  );
+}
+
+````
+
+### 設定画面を作る
+```sh
+touch src/screens/SettingsScreen.js
+```
+
+src/screens/SettingsScreen.js 
+```javascript
+import React from 'react';
+import { View, Text } from 'react-native';
+
+export default function SettingsScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Settings</Text>
+    </View>
+  );
+}
+````
+
+
+### タブスタックのコンポーネントを作る
+```sh
+touch src/screens/MainTabScreen.js
+```
+
+src/screens/MainTabScreen.js 
+```javascript
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from 'react';
+
+import { HomeScreen } from './HomeScreen';
+import { SettingsScreen } from './SettingsScreen';
+const Tab = createBottomTabNavigator();
+
+export const MainTabScreen = () => {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+    </Tab.Navigator>
+  );
+};
+
+```
+
+### モーダルスクリーンを作る
+```sh
+touch src/screens/ModalScreen.js
+```
+
+src/screens/ModalScreen.js 
+```javascript
+import React from 'react';
+import { View, Text } from 'react-native';
+
+export default function ModalScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Modal</Text>
+    </View>
+  );
+}
+
+```
