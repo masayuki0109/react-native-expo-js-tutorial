@@ -217,3 +217,81 @@ export default function ModalScreen() {
 }
 
 ```
+
+## step3 アイコンを使おう
+
+expoのデフォルトのアイコンを使います。詳しくは↓
+[Icons \- Expo Documentation](https://docs.expo.io/guides/icons/)
+アイコンの検索をする時はこちら↓
+[@expo/vector\-icons directory](https://icons.expo.fyi/)
+
+### タブバーにアイコンを追加する
+
+src/screens/MainTabScreen.js
+
+```js
+import { Ionicons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from 'react';
+
+import HomeScreen from './HomeScreen';
+import SettingsScreen from './SettingsScreen';
+const Tab = createBottomTabNavigator();
+
+export default function MainTabScreen() {
+  const screenOptions = ({ route }) => ({
+    tabBarIcon: ({ focused, color, size }) => {
+      let iconName = 'md-home';
+      if (route.name === 'Settings') iconName = 'md-settings';
+
+      return <Ionicons name={iconName} size={size} color={color} />;
+    },
+  });
+
+  return (
+    <Tab.Navigator
+      screenOptions={screenOptions}
+      tabBarOptions={{
+        activeTintColor: 'tomato',
+        inactiveTintColor: 'gray',
+      }}>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+    </Tab.Navigator>
+  );
+}
+```
+
+モーダルを表示するボタンをアイコンにする
+
+```javascript
+//src/screens/HomeScreen.js
+
+import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
+export default function HomeScreen({ navigation }) {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Home!</Text>
+      <TouchableOpacity style={styles.tweetButton} onPress={() => navigation.navigate('MyModal')}>
+        <Ionicons name="logo-twitter" size={32} color="white" />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  tweetButton: {
+    backgroundColor: '#20b2aa',
+    height: 50,
+    width: 50,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+```
