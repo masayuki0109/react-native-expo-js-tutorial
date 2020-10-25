@@ -4,7 +4,7 @@ import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import Card from '../components/Card';
+import Card from '../components/TweetCard';
 
 export default function HomeScreen({ navigation }) {
   return (
@@ -15,11 +15,7 @@ export default function HomeScreen({ navigation }) {
           content="ここに文章が入ります。"
           imageUrl="https://reactjs.org/logo-og.png"
         />
-        <Card
-          userName="Masayuki Yamaji"
-          content="ここに文章が入ります。"
-          imageUrl="https://reactjs.org/logo-og.png"
-        />
+        <Card userName="Masayuki Yamaji" content="ここに文章が入ります。" />
         <Card
           userName="Masayuki Yamaji"
           content="ここに文章が入ります。"

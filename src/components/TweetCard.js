@@ -1,9 +1,28 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Content, Card, CardItem, Thumbnail, Button, Body } from 'native-base';
-import React from 'react';
-import { Image, StyleSheet, View, Text } from 'react-native';
-export default function CardImageExample({ userName, content, imageUrl }) {
+import { Content, Card, CardItem, Thumbnail, Body } from 'native-base';
+import React, { useState } from 'react';
+import { Image, StyleSheet, View, Text, Share } from 'react-native';
+
+import ReactionButton from './ReactionButton';
+export default function TweetCard({ userName, content, imageUrl }) {
   const tweetImage = imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} />;
+
+  const [count, setCount] = useState(0);
+  const heartOnPress = () => {
+    setCount((count) => count + 1);
+  };
+
+  // tweetの内容をシェアする
+  const onShare = async (userName, content, imageUrl) => {
+    const url = imageUrl ? imageUrl : '';
+    try {
+      await Share.share({
+        message: `${userName} | ${content} ${url}`,
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <>
       <Content>
@@ -26,22 +45,17 @@ export default function CardImageExample({ userName, content, imageUrl }) {
                 {tweetImage}
               </Body>
               <View style={styles.reactionButtons}>
-                <Button transparent>
-                  <MaterialCommunityIcons name="comment-outline" size={24} color="black" />
-                  <Text>4</Text>
-                </Button>
-                <Button transparent>
-                  <MaterialCommunityIcons name="heart-outline" size={24} color="black" />
-                  <Text>4</Text>
-                </Button>
-                <Button transparent>
-                  <MaterialCommunityIcons name="twitter-retweet" size={24} color="black" />
-                  <Text>4</Text>
-                </Button>
-                <Button transparent>
-                  <MaterialCommunityIcons name="share" size={24} color="black" />
-                  <Text>4</Text>
-                </Button>
+                <ReactionButton iconName="comment-outline" />
+                <ReactionButton
+                  iconName="heart-outline"
+                  reactionCount={count}
+                  onPress={heartOnPress}
+                />
+                <ReactionButton iconName="twitter-retweet" />
+                <ReactionButton
+                  iconName="share"
+                  onPress={() => onShare(userName, content, imageUrl)}
+                />
               </View>
             </View>
           </CardItem>
