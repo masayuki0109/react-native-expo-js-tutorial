@@ -625,6 +625,11 @@ touch server/db.json
 
 [typicode/json\-server: Get a full fake REST API with zero coding in less than 30 seconds \(seriously\)](https://github.com/typicode/json-server)
 
+*注意*
+Androidエミュレーターを使用している方は、http://localhost:3000ではなく、http://10.0.2.2:3000を使用してください。
+Androidエミュレーターでは、localhostはエミュレーター自身を指しているので、モックサーバーに繋がりません。
+[Android Emulator のネットワークを設定する  \|  Android デベロッパー  \|  Android Developers](https://developer.android.com/studio/run/emulator-networking.html)
+
 
 dbとなる、ダミーjsonを作成します。
 ```json
