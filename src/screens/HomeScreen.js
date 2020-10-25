@@ -1,20 +1,44 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Container } from 'native-base';
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+
+import Card from '../components/Card';
 
 export default function HomeScreen({ navigation }) {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Home!</Text>
-      <TouchableOpacity style={styles.tweetButton} onPress={() => navigation.navigate('MyModal')}>
-        <Ionicons name="logo-twitter" size={32} color="white" />
-      </TouchableOpacity>
-    </View>
+    <Container>
+      <ScrollView style={styles.container}>
+        <Card
+          userName="Masayuki Yamaji"
+          content="ここに文章が入ります。"
+          imageUrl="https://reactjs.org/logo-og.png"
+        />
+        <Card
+          userName="Masayuki Yamaji"
+          content="ここに文章が入ります。"
+          imageUrl="https://reactjs.org/logo-og.png"
+        />
+        <Card
+          userName="Masayuki Yamaji"
+          content="ここに文章が入ります。"
+          imageUrl="https://reactjs.org/logo-og.png"
+        />
+      </ScrollView>
+      <View style={styles.bottomWrapper}>
+        <TouchableOpacity style={styles.tweetButton} onPress={() => navigation.navigate('MyModal')}>
+          <Ionicons name="logo-twitter" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+    </Container>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   tweetButton: {
     backgroundColor: '#20b2aa',
     height: 50,
@@ -22,5 +46,10 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bottomWrapper: {
+    right: 20,
+    bottom: 20,
+    position: 'absolute',
   },
 });
