@@ -1,0 +1,17 @@
+{
+  "posts": [
+    { "id": 1, "userId" :1, "content": "初めてのツイートだよ" },
+    { "id": 2, "userId" :2, "content": "画像アリのツイートだよ", "imageUrl": "https://reactjs.org/logo-og.png"},
+    { "id": 3, "userId" :2, "content": "長めのツイートだよ長めのツイートだよ長めのツイートだよ長めのツイートだよ\n 改行を含むよ" },
+    { "id": 4, "userId" :4, "content": "長めのツイートだよ" },
+    { "id": 5, "userId" :5, "content": "長めのツイートだよ" }
+  ],
+  "users": [
+    {"id": 1, "name": "山田　太郎" },
+    {"id": 2, "name": "山田　花子" },
+    {"id": 3, "name": "ツイート 史太郎" },
+    {"id": 4, "name": "コメント 史太郎" },
+    {"id": 5, "name": "リツート 史太郎" },
+    {"id": 5, "name": "クソリプ 史太郎" }
+  ]
+}

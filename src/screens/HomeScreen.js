@@ -1,26 +1,44 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from 'native-base';
-import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import Card from '../components/TweetCard';
 
+// 画像読み込み
+const getPosts = () => {
+  return fetch('http://localhost:3000/posts?_expand=user')
+    .then((res) => res.json())
+    .catch(() => alert('メンテナンス中です。'));
+};
+
 export default function HomeScreen({ navigation }) {
+  const [posts, setPosts] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // マウント時にpost内容を読み込み
+  useEffect(() => {
+    loading();
+  }, []);
+
+  const loading = async () => {
+    setRefreshing(true);
+    const posts = await getPosts();
+    setRefreshing(false);
+    setPosts(posts);
+  };
+
+  const tweets = posts?.map((post) => (
+    <Card userName={post.user.name} content={post.content} imageUrl={post.imageUrl} key={post.id} />
+  ));
+
   return (
     <Container>
-      <ScrollView style={styles.container}>
-        <Card
-          userName="Masayuki Yamaji"
-          content="ここに文章が入ります。"
-          imageUrl="https://reactjs.org/logo-og.png"
-        />
-        <Card userName="Masayuki Yamaji" content="ここに文章が入ります。" />
-        <Card
-          userName="Masayuki Yamaji"
-          content="ここに文章が入ります。"
-          imageUrl="https://reactjs.org/logo-og.png"
-        />
+      <ScrollView
+        style={styles.container}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loading} />}>
+        {tweets}
       </ScrollView>
       <View style={styles.bottomWrapper}>
         <TouchableOpacity style={styles.tweetButton} onPress={() => navigation.navigate('MyModal')}>

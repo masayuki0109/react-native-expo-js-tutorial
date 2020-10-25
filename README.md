@@ -608,3 +608,125 @@ const styles = StyleSheet.create({
 });
 
 ```
+
+
+## Step6 モックサーバーを用意する
+
+フロント・バックエンド完全分業のシチュエーションを想定して（バンクエンド作る余裕ありませんでした。ごめんなさい）
+server-jsonをインストールします。
+
+```sh
+npm install -g json-server
+mkdir server
+touch server/db.json
+```
+30秒くらいで、json形式の簡易apiサーバーが作れます。自分でゴリゴリAPIを開発しない時はすごく役立ちます。
+詳しくはこちらを↓。
+
+[typicode/json\-server: Get a full fake REST API with zero coding in less than 30 seconds \(seriously\)](https://github.com/typicode/json-server)
+
+
+dbとなる、ダミーjsonを作成します。
+```json
+{
+  "posts": [
+    { "id": 1, "userId" :1, "content": "初めてのツイートだよ" },
+    { "id": 2, "userId" :2, "content": "画像アリのツイートだよ", "imageUrl": "https://reactjs.org/logo-og.png"},
+    { "id": 3, "userId" :2, "content": "長めのツイートだよ長めのツイートだよ長めのツイートだよ長めのツイートだよ\n 改行を含むよ" },
+    { "id": 4, "userId" :4, "content": "長めのツイートだよ" },
+    { "id": 5, "userId" :5, "content": "長めのツイートだよ" }
+  ],
+  "users": [
+    {"id": 1, "name": "山田　太郎" },
+    {"id": 2, "name": "山田　花子" },
+    {"id": 3, "name": "ツイート 史太郎" },
+    {"id": 4, "name": "コメント 史太郎" },
+    {"id": 5, "name": "リツート 史太郎" },
+    {"id": 5, "name": "クソリプ 史太郎" }
+  ]
+}
+
+```
+
+3000ポートで立ち上げます。
+
+```sh
+json-server --watch server/db.json
+```
+
+ダミーデータを使うように、HomeScreenを編集 
+
+
+```javascript
+
+import { Ionicons } from '@expo/vector-icons';
+import { Container } from 'native-base';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
+import Card from '../components/TweetCard';
+
+// 画像読み込み
+const getPosts = () => {
+  return fetch('http://localhost:3000/posts?_expand=user')
+    .then((res) => res.json())
+    .catch(() => alert('メンテナンス中です。'));
+};
+
+export default function HomeScreen({ navigation }) {
+  const [posts, setPosts] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // マウント時にpost内容を読み込み
+  useEffect(() => {
+    loading();
+  }, []);
+
+  const loading = async () => {
+    setRefreshing(true);
+    const posts = await getPosts();
+    setRefreshing(false);
+    setPosts(posts);
+  };
+
+  const tweets = posts?.map((post) => (
+    <Card userName={post.user.name} content={post.content} imageUrl={post.imageUrl} key={post.id} />
+  ));
+
+  return (
+    <Container>
+      <ScrollView
+        style={styles.container}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loading} />}>
+        {tweets}
+      </ScrollView>
+      <View style={styles.bottomWrapper}>
+        <TouchableOpacity style={styles.tweetButton} onPress={() => navigation.navigate('MyModal')}>
+          <Ionicons name="logo-twitter" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+    </Container>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  tweetButton: {
+    backgroundColor: '#20b2aa',
+    height: 50,
+    width: 50,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomWrapper: {
+    right: 20,
+    bottom: 20,
+    position: 'absolute',
+  },
+});
+
+```
