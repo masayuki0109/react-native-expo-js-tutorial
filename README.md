@@ -730,3 +730,166 @@ const styles = StyleSheet.create({
 });
 
 ```
+
+## Step7 ユーザーの作成
+
+
+設定ページのヘッダーを作成
+
+```sh
+touch src/components/Header.js
+```
+
+```javascript
+// src/components/Header.js
+
+import React, { Component } from 'react';
+import { Container, Header, Left, Body, Right, Title } from 'native-base';
+export default class HeaderTitleExample extends Component {
+  render() {
+    return (
+      <Container>
+        <Header>
+          <Left/>
+          <Body>
+            <Title>Header</Title>
+          </Body>
+          <Right />
+        </Header>
+      </Container>
+    );
+  }
+}
+```
+
+ボタンコンポーネントを作成
+```sh
+touch src/components/Button.js
+```
+
+```javascript
+// src/components/Button.js
+
+import { Text, Button as NButton } from 'native-base';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+
+export default function Button({ title, onPress, disabled }) {
+  return (
+    <View style={styles.container}>
+      <View style={styles.wrapper}>
+        <NButton onPress={onPress} full rounded disabled={disabled}>
+          <Text>{title}</Text>
+        </NButton>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    marginBottom: 350,
+  },
+  wrapper: {
+    width: '80%',
+  },
+});
+
+```
+
+### データの永続化
+
+ユーザー情報をアプリ終了後も保持できるように永続化
+```sh
+expo install @react-native-community/async-storage
+```
+
+### ユーザー名を入力できるように修正
+
+```javascript
+
+// src/screens/SettingsScreen.js
+import AsyncStorage from '@react-native-community/async-storage';
+import { Container, Content, Form, Item, Input, Label } from 'native-base';
+import React, { useEffect } from 'react';
+
+import Button from '../components/Button';
+import Header from '../components/Header';
+import useInput from '../utils/useInput';
+
+// user登録
+const postUser = (data) => {
+  return fetch('http://localhost:3000/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+    .then((res) => res.json())
+    .catch(() => alert('メンテナンス中です。'));
+};
+
+export default function SettingsScreen() {
+  // 空文字でなければ、OKとする
+  const validation = (input) => !!input;
+  const [name, nameValid, onChangeName] = useInput(validation);
+  const [pass, passValid, onChangePass] = useInput(validation);
+
+  const buttonOnPress = async () => {
+    postUser({ name });
+    // ユーザー名の永続化
+    await AsyncStorage.setItem('name', name);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const name = await AsyncStorage.getItem('name');
+      onChangeName(name);
+    })();
+  }, []);
+
+  return (
+    <Container>
+      <Header title="設定" />
+      <Content scrollEnabled={false}>
+        <Form>
+          <Item fixedLabel>
+            <Label>Username</Label>
+            <Input value={name} onChangeText={onChangeName} />
+          </Item>
+          <Item fixedLabel last>
+            <Label>Password</Label>
+            <Input value={pass} onChangeText={onChangePass} />
+          </Item>
+        </Form>
+      </Content>
+      <Button title="新規登録" disabled={!(nameValid && passValid)} onPress={buttonOnPress} />
+    </Container>
+  );
+}
+
+```
+
+テキストフォームのカスタムフック
+
+```sh
+mkdir src/utils
+touch src/utils/useInput.js
+```
+
+```javascript
+
+// src/utils/useInput.js
+import { useState } from 'react';
+
+export default function useInput(validation) {
+  const [input, setInput] = useState();
+  const [valid, setValid] = useState(false);
+  const onChange = (input) => {
+    setInput(input);
+    setValid(validation(input));
+  };
+  return [input, valid, onChange];
+}
+
+```
