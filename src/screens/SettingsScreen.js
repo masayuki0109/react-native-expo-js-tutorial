@@ -33,7 +33,7 @@ export default function SettingsScreen() {
     (async () => {
       const result = await AsyncStorage.getItem('user');
       const user = JSON.parse(result);
-      onChangeName(user.name);
+      onChangeName(user?.name);
     })();
   }, []);
 

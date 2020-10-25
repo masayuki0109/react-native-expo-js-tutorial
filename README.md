@@ -27,8 +27,9 @@ npm install @react-navigation/bottom-tabs
 
 試しに、２つのタブと画面を作成
 
-### ./App.js
 ```javascript
+// ./App.js
+
 import 'react-native-gesture-handler';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
@@ -71,6 +72,8 @@ function SettingsScreen() {
 
 
 ```javascript
+
+// ./App.js
 import 'react-native-gesture-handler';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
@@ -137,8 +140,9 @@ function SettingsScreen() {
 touch src/screens/HomeScreen.js
 ```
 
-src/screens/HomeScreen.js 
 ```javascript
+// src/screens/HomeScreen.js 
+
 import React from 'react';
 import { View, Button, Text } from 'react-native';
 
@@ -158,8 +162,9 @@ export default function HomeScreen({ navigation }) {
 touch src/screens/SettingsScreen.js
 ```
 
-src/screens/SettingsScreen.js 
 ```javascript
+// src/screens/SettingsScreen.js 
+
 import React from 'react';
 import { View, Text } from 'react-native';
 
@@ -178,8 +183,9 @@ export default function SettingsScreen() {
 touch src/screens/MainTabScreen.js
 ```
 
-src/screens/MainTabScreen.js 
 ```javascript
+// src/screens/MainTabScreen.js 
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 
@@ -203,8 +209,9 @@ export const MainTabScreen = () => {
 touch src/screens/ModalScreen.js
 ```
 
-src/screens/ModalScreen.js 
 ```javascript
+// src/screens/ModalScreen.js 
+
 import React from 'react';
 import { View, Text } from 'react-native';
 
@@ -227,9 +234,10 @@ expoのデフォルトのアイコンを使います。詳しくは↓
 
 ### タブバーにアイコンを追加する
 
-src/screens/MainTabScreen.js
 
 ```js
+// src/screens/MainTabScreen.js
+
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
@@ -312,8 +320,8 @@ touch src/components/Card.js
 ```
 
 ```javascript
-
 // src/components/TweetCard.js
+
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Content, Card, CardItem, Thumbnail, Button, Body } from 'native-base';
 import React from 'react';
@@ -407,6 +415,8 @@ const styles = StyleSheet.create({
 Home画面で、作成したtweetを表示するためにCardコンポーネントを追加します。
 
 ```javascript
+// src/screens/HomeScreen.js
+
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from 'native-base';
 import React from 'react';
@@ -633,6 +643,8 @@ Androidエミュレーターでは、localhostはエミュレーター自身を�
 
 dbとなる、ダミーjsonを作成します。
 ```json
+// server/db.json
+
 {
   "posts": [
     { "id": 1, "userId" :1, "content": "初めてのツイートだよ" },
@@ -663,6 +675,7 @@ json-server --watch server/db.json
 
 
 ```javascript
+// src/screens/HomeScreen.js
 
 import { Ionicons } from '@expo/vector-icons';
 import { Container } from 'native-base';
@@ -813,8 +826,8 @@ expo install @react-native-community/async-storage
 ### ユーザー名を入力できるように修正
 
 ```javascript
-
 // src/screens/SettingsScreen.js
+
 import AsyncStorage from '@react-native-community/async-storage';
 import { Container, Content, Form, Item, Input, Label } from 'native-base';
 import React, { useEffect } from 'react';
@@ -883,8 +896,8 @@ touch src/utils/useInput.js
 ```
 
 ```javascript
-
 // src/utils/useInput.js
+
 import { useState } from 'react';
 
 export default function useInput(validation) {
@@ -905,6 +918,7 @@ Headerに左右のボタンを表示できるように修正
 
 ```javascript
 // src/components/Header.js
+
 import { Header as NBHeader, Left, Body, Right, Title } from 'native-base';
 import React from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -937,6 +951,7 @@ Navigationによるデフォルトのヘッダーを非表示
 
 ```javascript
 // App.js
+
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
