@@ -17,7 +17,7 @@ export default function Button({ title, onPress, disabled }) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginBottom: 350,
+    marginTop: 50,
   },
   wrapper: {
     width: '80%',

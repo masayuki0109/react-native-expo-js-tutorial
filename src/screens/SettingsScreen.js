@@ -51,8 +51,8 @@ export default function SettingsScreen() {
             <Input value={pass} onChangeText={onChangePass} />
           </Item>
         </Form>
+        <Button title="新規登録" disabled={!(nameValid && passValid)} onPress={buttonOnPress} />
       </Content>
-      <Button title="新規登録" disabled={!(nameValid && passValid)} onPress={buttonOnPress} />
     </Container>
   );
 }

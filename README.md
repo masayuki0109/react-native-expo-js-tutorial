@@ -789,7 +789,7 @@ export default function Button({ title, onPress, disabled }) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginBottom: 350,
+    marginTop: 50,
   },
   wrapper: {
     width: '80%',
@@ -863,8 +863,8 @@ export default function SettingsScreen() {
             <Input value={pass} onChangeText={onChangePass} />
           </Item>
         </Form>
+        <Button title="新規登録" disabled={!(nameValid && passValid)} onPress={buttonOnPress} />
       </Content>
-      <Button title="新規登録" disabled={!(nameValid && passValid)} onPress={buttonOnPress} />
     </Container>
   );
 }
