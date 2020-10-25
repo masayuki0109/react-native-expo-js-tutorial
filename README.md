@@ -836,15 +836,16 @@ export default function SettingsScreen() {
   const [pass, passValid, onChangePass] = useInput(validation);
 
   const buttonOnPress = async () => {
-    postUser({ name });
+    const result = await postUser({ name });
     // ユーザー名の永続化
-    await AsyncStorage.setItem('name', name);
+    await AsyncStorage.setItem('user', JSON.stringify(result));
   };
 
   useEffect(() => {
     (async () => {
-      const name = await AsyncStorage.getItem('name');
-      onChangeName(name);
+      const result = await AsyncStorage.getItem('user');
+      const user = JSON.parse(result);
+      onChangeName(user.name);
     })();
   }, []);
 
@@ -867,7 +868,6 @@ export default function SettingsScreen() {
     </Container>
   );
 }
-
 ```
 
 テキストフォームのカスタムフック
@@ -891,5 +891,272 @@ export default function useInput(validation) {
   };
   return [input, valid, onChange];
 }
+
+```
+
+## Step8 ツイートの投稿
+
+Headerに左右のボタンを表示できるように修正
+
+```javascript
+// src/components/Header.js
+import { Header as NBHeader, Left, Body, Right, Title } from 'native-base';
+import React from 'react';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+export default function Header({ title, leftChildren, leftOnPress, rightChildren, rightOnPress }) {
+  const leftButton = !!leftChildren && (
+    <Left>
+      <TouchableOpacity onPress={leftOnPress}>{leftChildren}</TouchableOpacity>
+    </Left>
+  );
+
+  const rightButton = !!rightChildren && (
+    <Right>
+      <TouchableOpacity onPress={rightOnPress}>{rightChildren}</TouchableOpacity>
+    </Right>
+  );
+  return (
+    <NBHeader>
+      {leftButton}
+      <Body>
+        <Title>{title}</Title>
+      </Body>
+      {rightButton}
+    </NBHeader>
+  );
+}
+
+```
+
+Navigationによるデフォルトのヘッダーを非表示
+
+```javascript
+// App.js
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
+
+import MainTabScreen from './src/screens/MainTabScreen';
+import ModalScreen from './src/screens/ModalScreen';
+
+const RootStack = createStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <RootStack.Navigator mode="modal" screenOptions={{ headerShown: false }}>
+        <RootStack.Screen name="Main" component={MainTabScreen} options={{ headerShown: false }} />
+        <RootStack.Screen name="MyModal" component={ModalScreen} options={{}} />
+      </RootStack.Navigator>
+    </NavigationContainer>
+  );
+}
+```
+
+モーダルスクリーンを変更
+
+```javascript
+// src/screens/ModalScreen.js
+
+import AsyncStorage from '@react-native-community/async-storage';
+import { Container, Button, Text, CardItem, Thumbnail } from 'native-base';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, TextInput } from 'react-native';
+
+import Header from '../components/Header';
+import useInput from '../utils/useInput';
+
+// Tweet投稿
+const postTweet = (data) => {
+  return fetch('http://localhost:3000/posts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+    .then((res) => res.json())
+    .catch(() => alert('メンテナンス中です。'));
+};
+
+export default function ModalScreen({ navigation }) {
+  const validation = (input) => !!input;
+  const [name, setName] = useState();
+  const [id, setId] = useState();
+  const [tweet, valid, onChange] = useInput(validation);
+  const leftOnPress = () => {
+    navigation.goBack();
+  };
+
+  useEffect(() => {
+    (async () => {
+      const result = await AsyncStorage.getItem('user');
+      const user = JSON.parse(result);
+      setName(user.name);
+      setId(user.id);
+    })();
+  }, []);
+
+  const tweetButton = (
+    <Button small info rounded disabled={!valid}>
+      <Text>ツイート</Text>
+    </Button>
+  );
+  const tweetOnPress = () => {
+    postTweet({ userId: id, content: tweet });
+    navigation.goBack({ reload: true });
+  };
+
+  return (
+    <Container>
+      <Header
+        title=""
+        leftChildren={<Text>キャンセル</Text>}
+        leftOnPress={leftOnPress}
+        rightChildren={tweetButton}
+        rightOnPress={tweetOnPress}
+      />
+      <CardItem>
+        <View style={styles.leftWrapper}>
+          <Thumbnail
+            style={styles.thumbnail}
+            source={{
+              uri: `https://na.ui-avatars.com/api/?name=${name}?background=random`,
+            }}
+          />
+          <View style={styles.dummyItem} autoFocus />
+        </View>
+        <View style={styles.body}>
+          <TextInput
+            value={tweet}
+            onChangeText={onChange}
+            style={styles.textArea}
+            placeholder="今何してる?"
+            autoFocus
+            multiline
+          />
+        </View>
+      </CardItem>
+    </Container>
+  );
+}
+
+const styles = StyleSheet.create({
+  leftWrapper: {
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    marginRight: 10,
+    flex: 1,
+  },
+  dummyItem: {
+    flex: 30,
+  },
+  body: {
+    flex: 8,
+  },
+  thumbnail: {
+    width: 45,
+    height: 45,
+  },
+  textArea: {
+    paddingLeft: 0,
+    fontSize: 15,
+  },
+});
+
+```
+
+ホームスクリーンで、tweetの昇降順を変更
+スクリーンがフォーカスされたときに、更新するように
+
+
+```javascript
+// src/screens/HomeScreen.js
+
+import { Ionicons } from '@expo/vector-icons';
+import { Container } from 'native-base';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+
+import Card from '../components/TweetCard';
+
+// 画像読み込み
+const getPosts = () => {
+  return fetch('http://localhost:3000/posts?_expand=user')
+    .then((res) => res.json())
+    .catch(() => alert('メンテナンス中です。'));
+};
+
+export default function HomeScreen({ navigation }) {
+  const [posts, setPosts] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // マウント時にpost内容を読み込み
+  useEffect(() => {
+    loading();
+  }, []);
+
+  // このスクリーンがフォーカスされたときに発火するイベント
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      loading();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  const loading = async () => {
+    setRefreshing(true);
+    const posts = await getPosts();
+    setRefreshing(false);
+    setPosts(posts);
+  };
+
+  // 投稿を新しいもの順になるようにソート
+  const discId = (a, b) => a > b;
+  const tweets = posts
+    ?.sort(discId)
+    .map((post) => (
+      <Card
+        userName={post.user.name}
+        content={post.content}
+        imageUrl={post.imageUrl}
+        key={post.id}
+      />
+    ));
+
+  return (
+    <Container>
+      <ScrollView
+        style={styles.container}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loading} />}>
+        {tweets}
+      </ScrollView>
+      <View style={styles.bottomWrapper}>
+        <TouchableOpacity style={styles.tweetButton} onPress={() => navigation.navigate('MyModal')}>
+          <Ionicons name="logo-twitter" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+    </Container>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  tweetButton: {
+    backgroundColor: '#20b2aa',
+    height: 50,
+    width: 50,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomWrapper: {
+    right: 20,
+    bottom: 20,
+    position: 'absolute',
+  },
+});
 
 ```

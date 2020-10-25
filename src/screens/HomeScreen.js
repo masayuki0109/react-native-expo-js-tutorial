@@ -22,6 +22,14 @@ export default function HomeScreen({ navigation }) {
     loading();
   }, []);
 
+  // このスクリーンがフォーカスされたときに発火するイベント
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      loading();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   const loading = async () => {
     setRefreshing(true);
     const posts = await getPosts();
@@ -29,9 +37,18 @@ export default function HomeScreen({ navigation }) {
     setPosts(posts);
   };
 
-  const tweets = posts?.map((post) => (
-    <Card userName={post.user.name} content={post.content} imageUrl={post.imageUrl} key={post.id} />
-  ));
+  // 投稿を新しいもの順になるようにソート
+  const discId = (a, b) => a > b;
+  const tweets = posts
+    ?.sort(discId)
+    .map((post) => (
+      <Card
+        userName={post.user.name}
+        content={post.content}
+        imageUrl={post.imageUrl}
+        key={post.id}
+      />
+    ));
 
   return (
     <Container>

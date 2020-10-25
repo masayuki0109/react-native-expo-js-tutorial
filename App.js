@@ -11,9 +11,9 @@ const RootStack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <RootStack.Navigator mode="modal">
+      <RootStack.Navigator mode="modal" screenOptions={{ headerShown: false }}>
         <RootStack.Screen name="Main" component={MainTabScreen} options={{ headerShown: false }} />
-        <RootStack.Screen name="MyModal" component={ModalScreen} />
+        <RootStack.Screen name="MyModal" component={ModalScreen} options={{}} />
       </RootStack.Navigator>
     </NavigationContainer>
   );

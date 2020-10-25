@@ -24,15 +24,16 @@ export default function SettingsScreen() {
   const [pass, passValid, onChangePass] = useInput(validation);
 
   const buttonOnPress = async () => {
-    postUser({ name });
+    const result = await postUser({ name });
     // ユーザー名の永続化
-    await AsyncStorage.setItem('name', name);
+    await AsyncStorage.setItem('user', JSON.stringify(result));
   };
 
   useEffect(() => {
     (async () => {
-      const name = await AsyncStorage.getItem('name');
-      onChangeName(name);
+      const result = await AsyncStorage.getItem('user');
+      const user = JSON.parse(result);
+      onChangeName(user.name);
     })();
   }, []);
 
