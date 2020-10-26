@@ -452,7 +452,7 @@ import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import Card from '../components/Card';
+import Card from '../components/TweetCard';
 
 export default function HomeScreen({ navigation }) {
   return (
