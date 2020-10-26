@@ -345,7 +345,7 @@ npm install native-base
 tweetを表示するためのCardコンポーネントを作成します。
 
 ```sh
-touch src/components/Card.js 
+touch src/components/TweetCard.js 
 ```
 
 ```javascript
